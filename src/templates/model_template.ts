@@ -26,16 +26,16 @@ export function extraNestjsGraphqlFields(model: DMMF.Model) {
     });
   return [...new Set(inputs)];
 }
-export function type(f: DMMF.Field, prefix: "Base" | "Prisma" = "Base") {
-  if (f.kind === "object") return `${prefix}${f.type}`;
-  if (f.kind === "enum") return `keyof typeof ${f.type}`;
+export function type(f: DMMF.Field, prefix: "Base" | "Prisma" = "Base", isList = true) {
+  if (f.kind === "object") return `${prefix}${f.type}${f.isList && isList ? "[]" : ""}`;
+  if (f.kind === "enum") return `${f.isList ? '(' : ''}keyof typeof ${f.type}${f.isList ? ')' : ''}${f.isList && isList ? "[]" : ""}`;
   const map: Record<string, string> = {
     String: "string",
     Int: "number",
     Boolean: "boolean",
     DateTime: "Date",
   };
-  return map[f.type] ?? f.type;
+  return `${map[f.type] ?? f.type}${f.isList &&  isList ? "[]" : ""}`;
 }
 
 export function graphqlType(f: DMMF.Field, forceOptional = false) {
@@ -69,14 +69,14 @@ export function importValidations(model: DMMF.Model) {
 function getDefaultValue(field: DMMF.Field) {
   if (field.hasDefaultValue) {
     // @ts-ignore
-    const name: string = field.default.name;
-    if (name === "uuid") return "?? uuid()";
-    if (name === "cuid") return "?? cuid()";
+    const name: string = field.default?.name;
+    if (name === "uuid") return "?? v4()";
     if (name === "now") return "?? new Date()";
     if (name === "autoincrement") return "!";
+    if (name === "auto") return "";
 
     if (field.default !== undefined) {
-      if (field.kind === "enum") return `?? ${field.type}.${field.default}`;
+      if (field.kind === "enum") return `?? ${field.isList ? `[${(field.default as unknown as string[]).map((d) => `${field.type}.${d}`).join(",")}]` : `${field.type}.${field.default}`}`;
       return `?? ${field.default}`;
     }
   }
@@ -92,7 +92,7 @@ export function importRelations(
 ): string {
   let fields = model.fields.filter(f => f.kind == "object");
   if (filterOutRelations) fields = fields.filter(f => !f.relationName);
-  return fields.map(f => `import { ${type(f)} } from "./${modelPath(f)}";`).join("\n");
+  return fields.map(f => `import { ${type(f,undefined,false)} } from "./${modelPath(f)}";`).join("\n");
 }
 
 function graphqlFields(f: DMMF.Field) {

@@ -20,4 +20,6 @@ export function registerEnums() {
     )
     .join("")}
 }
+
+registerEnums();
 `;
