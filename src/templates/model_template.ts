@@ -117,7 +117,7 @@ function createClassField(field: DMMF.Field) {
   if (isRequired(field)) result += ":";
   else result += ": null | ";
   result += type(field);
-  if (field.isList) result += "[]";
+  // if (field.isList) result += "[]";
 
   return result;
 }
@@ -147,7 +147,7 @@ export type ${model.name}Constructor = {
       if (optional) result += "?";
       result += ": ";
       result += type(f, "Base");
-      if (f.isList) result += "[]";
+      // if (f.isList) result += "[]";
       if (optional) result += ` | null`;
       return result;
     })
