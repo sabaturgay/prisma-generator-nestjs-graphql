@@ -7,9 +7,11 @@ import { GENERATOR_NAME } from "./constants";
 import { writeFileSafely } from "./utils/writeFileSafely";
 import { generateModelTemplate } from "./templates/model_template";
 import { generateDtoTemplate } from "./templates/dto_template";
+import { generatePaginatorTemplate } from "./templates/paginator";
 import { registerEnumsTemplate } from "./templates/register_enum_template";
 
-const { version } = require("../package.json");
+// const { version } = require("../package.json");
+const version = "1.0.1"
 
 generatorHandler({
   onManifest() {
@@ -42,7 +44,7 @@ generatorHandler({
       }),
     );
 
-    const contents = await fs.readFile(path.join(__dirname, "../copy/paginator.ts"));
+    const contents = generatePaginatorTemplate()//await fs.readFile(path.join(__dirname, "copy/paginator.ts"));
     await writeFileSafely(writePath("/paginator.ts"), contents.toString());
 
     const globPath = writePath(`/`);
