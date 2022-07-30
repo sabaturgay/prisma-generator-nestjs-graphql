@@ -1,11 +1,11 @@
 {
-  "name": "@jmondi/prisma-generator-nestjs-graphql",
-  "version": "1.0.0-rc.8",
+  "name": "prisma-generator-nestjs-graphql",
+  "version": "1.0.0",
   "main": "src/generator.ts",
   "scripts": {
     "build": "tsc",
     "format": "prettier --write \"src/**/*.(t|j)s*\"",
-    "prepublish": "rm -rf ./dist && pnpm build"
+    "fire": "yarn build && yarn version --patch && cp ./package.json ./dist && cd dist && npm publish"
   },
   "dependencies": {
     "@prisma/client": "^3.14.0",
